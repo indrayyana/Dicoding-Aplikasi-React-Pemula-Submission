@@ -1,17 +1,19 @@
 import React from "react";
 import { getInitialData } from "../utils";
+import autoBind from "auto-bind";
 import NotesList from "./NotesList";
 import NoteInput from "./NoteInput";
+import NoteSearch from "./NoteSearch";
 
 class NotesApp extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       notes: getInitialData(),
+      searchKeyword: "",
     };
 
-    this.onAddNoteHandler = this.onAddNoteHandler.bind(this);
-    this.onDeleteHandler = this.onDeleteHandler.bind(this);
+    autoBind(this);
   }
 
   onAddNoteHandler({ title, body }) {
@@ -28,6 +30,8 @@ class NotesApp extends React.Component {
               archived: false,
             },
           ],
+          title: "",
+          body: "",
         };
       },
       () => {
@@ -41,17 +45,57 @@ class NotesApp extends React.Component {
     this.setState({ notes });
   }
 
+  onArchiveHandler(id) {
+    const updateNotes = this.state.notes.map((note) =>
+      note.id === id ? { ...note, archived: !note.archived } : note
+    );
+    this.setState({ notes: updateNotes });
+  }
+
+  onSearchChangeHandler(event) {
+    this.setState(() => {
+      return {
+        searchKeyword: event.target.value,
+      };
+    });
+  }
+
   render() {
+    const activeNotes = this.state.notes.filter((note) => !note.archived);
+    const archivedNotes = this.state.notes.filter((note) => note.archived);
+    const filteredNotes = activeNotes.filter((note) =>
+      note.title.toLowerCase().includes(this.state.searchKeyword.toLowerCase())
+    );
+
     return (
       <>
         <div className="note-app__header">
           <h1>Notes</h1>
+          <NoteSearch keyword={this.state.searchKeyword} onSearchChange={this.onSearchChangeHandler} />
         </div>
         <div className="note-app__body">
           <NoteInput addNote={this.onAddNoteHandler} />
           <h2>Catatan Aktif</h2>
-          <NotesList notes={this.state.notes} onDelete={this.onDeleteHandler} />
+          {filteredNotes.length === 0 ? (
+            <p className="notes-list__empty-message">Tidak ada catatan</p>
+          ) : (
+            <NotesList
+              notes={filteredNotes}
+              onDelete={this.onDeleteHandler}
+              onArchive={this.onArchiveHandler}
+            />
+          )}
+
           <h2>Arsip</h2>
+          {archivedNotes.length === 0 ? (
+            <p className="notes-list__empty-message">Tidak ada catatan</p>
+          ) : (
+            <NotesList
+              notes={archivedNotes}
+              onDelete={this.onDeleteHandler}
+              onArchive={this.onArchiveHandler}
+            />
+          )}
         </div>
       </>
     );

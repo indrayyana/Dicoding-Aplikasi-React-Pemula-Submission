@@ -1,4 +1,5 @@
 import React from "react";
+import autoBind from "auto-bind";
 
 class NoteInput extends React.Component {
   constructor(props) {
@@ -7,19 +8,22 @@ class NoteInput extends React.Component {
     this.state = {
       title: "",
       body: "",
+      titleCharLimit: 50,
     };
 
-    this.onTitleChangeEventHandler = this.onTitleChangeEventHandler.bind(this);
-    this.onBodyChangeEventHandler = this.onBodyChangeEventHandler.bind(this);
-    this.onSubmitEventHandler = this.onSubmitEventHandler.bind(this);
+    autoBind(this);
   }
 
   onTitleChangeEventHandler(event) {
-    this.setState(() => {
-      return {
-        title: event.target.value,
-      };
-    });
+    const inputTitle = event.target.value;
+
+    if (inputTitle.length <= this.state.titleCharLimit) {
+      this.setState(() => {
+        return {
+          title: inputTitle,
+        };
+      });
+    }
   }
 
   onBodyChangeEventHandler(event) {
@@ -33,14 +37,24 @@ class NoteInput extends React.Component {
   onSubmitEventHandler(event) {
     event.preventDefault();
     this.props.addNote(this.state);
+    this.setState(() => {
+      return {
+        title: "",
+        body: "",
+      };
+    });
   }
 
   render() {
+    const remainingTitleChars = this.state.titleCharLimit - this.state.title.length;
+
     return (
       <div className="note-input">
         <h2>Buat catatan</h2>
         <form onSubmit={this.onSubmitEventHandler}>
+          <p className="note-input__title__char-limit">Sisa karakter: {remainingTitleChars}</p>
           <input
+            className="note-input__title"
             type="text"
             placeholder="ini adalah judul ..."
             required
