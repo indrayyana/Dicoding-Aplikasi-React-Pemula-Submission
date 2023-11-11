@@ -1,5 +1,4 @@
 import React from "react";
-import autoBind from "auto-bind";
 
 class NoteInput extends React.Component {
   constructor(props) {
@@ -10,11 +9,9 @@ class NoteInput extends React.Component {
       body: "",
       titleCharLimit: 50,
     };
-
-    autoBind(this);
   }
 
-  onTitleChangeEventHandler(event) {
+  onTitleChangeEventHandler = (event) => {
     const inputTitle = event.target.value;
 
     if (inputTitle.length <= this.state.titleCharLimit) {
@@ -24,17 +21,17 @@ class NoteInput extends React.Component {
         };
       });
     }
-  }
+  };
 
-  onBodyChangeEventHandler(event) {
+  onBodyChangeEventHandler = (event) => {
     this.setState(() => {
       return {
         body: event.target.value,
       };
     });
-  }
+  };
 
-  onSubmitEventHandler(event) {
+  onSubmitEventHandler = (event) => {
     event.preventDefault();
     this.props.addNote(this.state);
     this.setState(() => {
@@ -43,7 +40,7 @@ class NoteInput extends React.Component {
         body: "",
       };
     });
-  }
+  };
 
   render() {
     const remainingTitleChars = this.state.titleCharLimit - this.state.title.length;

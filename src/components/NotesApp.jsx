@@ -1,6 +1,5 @@
 import React from "react";
 import { getInitialData } from "../utils";
-import autoBind from "auto-bind";
 import NotesList from "./NotesList";
 import NoteInput from "./NoteInput";
 import NoteSearch from "./NoteSearch";
@@ -12,11 +11,9 @@ class NotesApp extends React.Component {
       notes: getInitialData(),
       searchKeyword: "",
     };
-
-    autoBind(this);
   }
 
-  onAddNoteHandler({ title, body }) {
+  onAddNoteHandler = ({ title, body }) => {
     this.setState(
       (prevState) => {
         return {
@@ -38,34 +35,35 @@ class NotesApp extends React.Component {
         alert("Catatan berhasil ditambahkan!");
       }
     );
-  }
+  };
 
-  onDeleteHandler(id) {
+  onDeleteHandler = (id) => {
     const notes = this.state.notes.filter((note) => note.id !== id);
     this.setState({ notes });
-  }
+  };
 
-  onArchiveHandler(id) {
+  onArchiveHandler = (id) => {
     const updateNotes = this.state.notes.map((note) =>
       note.id === id ? { ...note, archived: !note.archived } : note
     );
     this.setState({ notes: updateNotes });
-  }
+  };
 
-  onSearchChangeHandler(event) {
+  onSearchChangeHandler = (event) => {
     this.setState(() => {
       return {
         searchKeyword: event.target.value,
       };
     });
-  }
+  };
 
   render() {
-    const activeNotes = this.state.notes.filter((note) => !note.archived);
-    const archivedNotes = this.state.notes.filter((note) => note.archived);
-    const filteredNotes = activeNotes.filter((note) =>
+    const filteredNotes = this.state.notes.filter((note) =>
       note.title.toLowerCase().includes(this.state.searchKeyword.toLowerCase())
     );
+
+    const activeNotes = filteredNotes.filter((note) => !note.archived);
+    const archivedNotes = filteredNotes.filter((note) => note.archived);
 
     return (
       <>
@@ -76,7 +74,7 @@ class NotesApp extends React.Component {
         <div className="note-app__body">
           <NoteInput addNote={this.onAddNoteHandler} />
           <h2>Catatan Aktif</h2>
-          {filteredNotes.length === 0 ? (
+          {activeNotes.length === 0 ? (
             <p className="notes-list__empty-message">Tidak ada catatan</p>
           ) : (
             <NotesList
