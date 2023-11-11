@@ -78,7 +78,7 @@ class NotesApp extends React.Component {
             <p className="notes-list__empty-message">Tidak ada catatan</p>
           ) : (
             <NotesList
-              notes={filteredNotes}
+              notes={activeNotes}
               onDelete={this.onDeleteHandler}
               onArchive={this.onArchiveHandler}
             />
